@@ -7,6 +7,9 @@ class Source(models.Model):
     limit = models.PositiveIntegerField()
     is_active = models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Target(models.Model):
     source = models.ForeignKey(Source, related_name='targets', on_delete=models.CASCADE)

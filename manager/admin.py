@@ -12,7 +12,7 @@ class SourceModelAdmin(admin.ModelAdmin):
 
 @admin.register(Target)
 class TargetModelAdmin(admin.ModelAdmin):
-    list_display = ('get_source_name', 'url', 'publish_time', 'created_at')
+    list_display = ('get_source_name', 'url', 'traffic', 'publish_time', 'created_at')
     search_fields = ('url', 'source__name')
 
     def get_source_name(self, obj):

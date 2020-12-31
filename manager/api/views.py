@@ -1,12 +1,12 @@
 import random
 import json
 
-from django.db.models import Sum, F
+from django.db.models import F
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from manager.models import Target, Source
+from manager.models import Source
 
 
 class GetRandomTargetsApiView(APIView):
@@ -14,21 +14,39 @@ class GetRandomTargetsApiView(APIView):
 
     def get(self, request):
 
-        source_ids = Target.objects.values('source').annotate(
-            traffic_count=Sum('traffic')
-        ).filter(
-            traffic_count__lt=F('source__limit')
-        ).values_list(
-            'source',
-            flat=True
-        )
+        sources = Source.objects.raw("""
+            SELECT
+                "manager_source"."id",
+                "manager_source"."name",
+                "manager_source"."url",
+                "manager_source"."limit",
+                "manager_source"."is_active",
+                (
+                    SELECT SUM("traffic") AS "traffic_count"
+                    FROM (
+                        SELECT "traffic" FROM "manager_target" WHERE "source_id" = "manager_source"."id" ORDER BY "publish_time" DESC LIMIT 5
+                    )
+                ) AS "traffic_count"
+            FROM "manager_source"
+            WHERE (
+                "manager_source"."is_active"
+            AND (
+                SELECT SUM("traffic") AS "traffic_count"
+                FROM (
+                    SELECT "traffic"
+                    FROM "manager_target"
+                    WHERE "source_id" = "manager_source"."id"
+                    ORDER BY "publish_time" DESC
+                    LIMIT 5
+                )) < "manager_source"."limit"
+            )
+        """)
 
         random_targets = []
 
-        for source_id in source_ids:
-            source = Source.objects.get(id=source_id)
-
-            target = random.choice(source.targets.order_by('-publish_time')[:5])    # TODO: move limit number to the config
+        for source in sources:
+            # NOTE: Could move this operation to shared task
+            target = random.choice(source.targets.order_by('-publish_time')[:5])
             target.traffic = F('traffic') + 1
             target.save()
 

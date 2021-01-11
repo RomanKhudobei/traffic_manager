@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from manager.models import Source
+from manager.models import Source, StaticTarget
 
 
 class GetRandomTargetsApiView(APIView):
@@ -42,5 +42,7 @@ class GetRandomTargetsApiView(APIView):
             target.save()
 
             random_targets.append(target.url)
+
+        random_targets.extend(StaticTarget.objects.filter(is_active=True).values_list('url', flat=True))
 
         return Response(data=random_targets, status=status.HTTP_200_OK)

@@ -18,3 +18,9 @@ class Target(models.Model):
     traffic = models.PositiveIntegerField(default=0)
     publish_time = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class StaticTarget(models.Model):
+    name = models.CharField(max_length=50)
+    url = models.URLField(unique=True)
+    is_active = models.BooleanField(default=True)

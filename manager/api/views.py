@@ -29,15 +29,7 @@ class GetRandomTargetsApiView(APIView):
             FROM "manager_source"
             WHERE (
                 "manager_source"."is_active"
-            AND (
-                SELECT SUM("traffic") AS "traffic_count"
-                FROM (
-                    SELECT "traffic"
-                    FROM "manager_target"
-                    WHERE "source_id" = "manager_source"."id"
-                    ORDER BY "publish_time" DESC
-                    LIMIT 5
-                )) < "manager_source"."limit"
+                AND "traffic_count" < "manager_source"."limit"
             )
         """)
 

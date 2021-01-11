@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from manager.models import Source, Target
+from manager.models import Source, Target, StaticTarget
 
 
 @admin.register(Source)
@@ -17,3 +17,10 @@ class TargetModelAdmin(admin.ModelAdmin):
 
     def get_source_name(self, obj):
         return obj.source.name
+
+
+@admin.register(StaticTarget)
+class StaticTargetModelAdmin(admin.ModelAdmin):
+    list_display = ('name', 'url', 'is_active')
+    search_fields = ('name', 'url')
+    list_filter = ('is_active',)

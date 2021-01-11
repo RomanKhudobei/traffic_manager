@@ -14,9 +14,13 @@ class SourceModelAdmin(admin.ModelAdmin):
 class TargetModelAdmin(admin.ModelAdmin):
     list_display = ('get_source_name', 'url', 'traffic', 'publish_time', 'created_at')
     search_fields = ('url', 'source__name')
+    list_filter = ('source__name',)
 
     def get_source_name(self, obj):
         return obj.source.name
+
+    get_source_name.short_description = 'Source name'
+    get_source_name.admin_order_field = 'source__name'
 
 
 @admin.register(StaticTarget)

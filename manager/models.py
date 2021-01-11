@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class Source(models.Model):
@@ -15,5 +16,5 @@ class Target(models.Model):
     source = models.ForeignKey(Source, related_name='targets', on_delete=models.CASCADE)
     url = models.URLField(help_text='Посилання, яке поміщатиметься в iframe у віджеті')
     traffic = models.PositiveIntegerField(default=0)
-    publish_time = models.DateTimeField()
+    publish_time = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)

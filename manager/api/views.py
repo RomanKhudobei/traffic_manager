@@ -1,5 +1,4 @@
 import random
-import json
 
 from django.db.models import F
 from rest_framework import status
@@ -52,4 +51,4 @@ class GetRandomTargetsApiView(APIView):
 
             random_targets.append(target.url)
 
-        return Response(data=json.dumps(random_targets), status=status.HTTP_200_OK)
+        return Response(data=random_targets, status=status.HTTP_200_OK)

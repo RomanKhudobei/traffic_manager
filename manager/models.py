@@ -3,6 +3,9 @@ from django.utils import timezone
 
 
 class Source(models.Model):
+    """
+    Source of targets. Basically url to site feed
+    """
     name = models.CharField(max_length=50)
     url = models.URLField(unique=True, help_text='Посилання на RSS стрічку')
     limit = models.PositiveIntegerField()
@@ -13,6 +16,9 @@ class Source(models.Model):
 
 
 class Target(models.Model):
+    """
+    Url, which will receive traffic
+    """
     source = models.ForeignKey(Source, related_name='targets', on_delete=models.CASCADE)
     url = models.URLField(help_text='Посилання, яке поміщатиметься в iframe у віджеті')
     traffic = models.PositiveIntegerField(default=0)
@@ -21,6 +27,9 @@ class Target(models.Model):
 
 
 class StaticTarget(models.Model):
+    """
+    Static target is permanent target (without traffic limit)
+    """
     name = models.CharField(max_length=50)
     url = models.URLField(unique=True)
     is_active = models.BooleanField(default=True)

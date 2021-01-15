@@ -7,15 +7,15 @@ from django.utils import timezone
 from manager.models import Source, Target, StaticTarget
 
 
-class RandomTargetsViewTestCases(TestCase):
+class RandomTargetsViewTestCase(TestCase):
 
-    def get_source(self, name='Test', url='test.com/', limit=1, is_active=True):
+    def get_source(self, name='Test', url='test.com', limit=1, is_active=True):
         return Source.objects.create(name=name, url=url, limit=limit, is_active=is_active)
 
     def get_target(self, source, url='test1.com', traffic=0, publish_time=timezone.now()):
         return Target.objects.create(source=source, url=url, traffic=traffic, publish_time=publish_time)
 
-    def get_static_target(self, name='Test', url='static-test.com/', is_active=True):
+    def get_static_target(self, name='Test', url='static-test.com', is_active=True):
         return StaticTarget.objects.create(name=name, url=url, is_active=is_active)
 
     def test_target_returned_in_response(self):
@@ -28,12 +28,12 @@ class RandomTargetsViewTestCases(TestCase):
 
     def test_one_random_target_returned_from_each_source(self):
         source1 = self.get_source()
-        target11 = self.get_target(source1)
-        target12 = self.get_target(source1)
+        target11 = self.get_target(source1, url='test11.com')
+        target12 = self.get_target(source1, url='test12.com')
 
-        source2 = self.get_source(name='Test2', url='test2.com/')
-        target21 = self.get_target(source2)
-        target22 = self.get_target(source2)
+        source2 = self.get_source(name='Test2', url='test2.com')
+        target21 = self.get_target(source2, url='test21.com')
+        target22 = self.get_target(source2, url='test22.com')
 
         random_targets = json.loads(
             self.client.get(reverse('manager:random_targets')).content.decode()
@@ -53,7 +53,7 @@ class RandomTargetsViewTestCases(TestCase):
         self.client.get(reverse('manager:random_targets'))
 
         target.refresh_from_db()
-        self.assertEquals(target.traffic, 1)
+        self.assertEqual(target.traffic, 1)
 
     def test_target_traffic_not_overcomes_source_limit(self):
         source = self.get_source()
@@ -74,7 +74,7 @@ class RandomTargetsViewTestCases(TestCase):
 
         target.refresh_from_db()
 
-        self.assertEquals(target.traffic, 0)
+        self.assertEqual(target.traffic, 0)
         self.assertJSONEqual(random_targets.content.decode(), [])
 
     def test_one_of_last_five_published_targets_are_returned(self):

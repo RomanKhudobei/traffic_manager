@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_q',
     'manager',
 ]
 
@@ -149,4 +150,9 @@ LOGGING = {
             'level': 'DEBUG'
         },
     },
+}
+
+Q_CLUSTER = {
+    "name": "default",
+    "orm": "default",  # Use Django's ORM + database for broker
 }

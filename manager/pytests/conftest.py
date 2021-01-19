@@ -1,5 +1,6 @@
 import pytest
 from django.utils import timezone
+from rest_framework_api_key.models import APIKey
 
 from manager.models import Target, Source, StaticTarget
 from manager.tasks import parse_sources
@@ -39,3 +40,12 @@ def call_parse_sources(db):
         parse_sources()
 
     return make_call_parse_sources
+
+
+@pytest.fixture(scope='module')
+def auth_header(django_db_blocker):
+
+    with django_db_blocker.unblock():
+        api_key_obj, key = APIKey.objects.create_key(name='Test')
+
+    return {'HTTP_AUTHORIZATION': f'Api-Key {key}'}

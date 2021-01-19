@@ -4,12 +4,13 @@ from django.db.models import F
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_api_key.permissions import HasAPIKey
 
 from manager.models import Source, StaticTarget
 
 
 class GetRandomTargetsApiView(APIView):
-    # TODO: implement auth
+    permission_classes = [HasAPIKey]
 
     def get(self, request):
 

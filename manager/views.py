@@ -18,7 +18,9 @@ def source_statistic_view(request):
 
     try:
         selected_date = dt.date.fromisoformat(request.GET.get('date'))
-    except (TypeError, ValueError):
+        assert source.targets.filter(created_at__date=selected_date).first() is not None
+
+    except (TypeError, ValueError, AssertionError):
         selected_date = dates[0] if dates else dt.date.today()
 
     targets = source.targets.filter(created_at__date=selected_date).order_by('-created_at')

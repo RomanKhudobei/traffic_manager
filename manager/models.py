@@ -20,7 +20,8 @@ class Target(models.Model):
     Url, which will receive traffic
     """
     source = models.ForeignKey(Source, related_name='targets', on_delete=models.CASCADE)
-    url = models.URLField(help_text='Посилання, яке поміщатиметься в iframe у віджеті')
+    title = models.CharField(max_length=200, default='Немає')
+    url = models.URLField(help_text='Посилання, яке поміщатиметься в iframe у віджеті') # TODO: think whether to add unique constraint
     traffic = models.PositiveIntegerField(default=0)
     publish_time = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)

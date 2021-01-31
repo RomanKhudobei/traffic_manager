@@ -39,6 +39,7 @@ class SourceParser:
         for item in items:
             publish_time = SourceParser.__extract_publish_time(item)
             url = item.get('link')
+            title = item.get('title')
 
             if url is None:
                 logger.warning(f'Source id "{source.id}" has item without url in feed')
@@ -49,6 +50,7 @@ class SourceParser:
 
             Target.objects.get_or_create(
                 source=source,
+                title=title,
                 url=url,
                 **({'publish_time': publish_time} if publish_time else {})
             )

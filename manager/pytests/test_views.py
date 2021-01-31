@@ -133,4 +133,5 @@ def test_targets_not_returned_without_api_key(create_source, create_target, clie
     response = client.get(reverse('manager:random_targets'))
     random_targets = response.data
 
+    assert response.status_code == 403
     assert random_targets == {'detail': 'Authentication credentials were not provided.'}

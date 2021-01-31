@@ -16,8 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from manager import views as manager_views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    path('source/statistic/', manager_views.source_statistic_view, name='source_statistic'),
     path('', include(('manager.api.urls', 'manager'), namespace='manager')),
 ]

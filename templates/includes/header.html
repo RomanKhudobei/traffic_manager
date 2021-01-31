@@ -1,7 +1,25 @@
 <nav class="navbar navbar-light pt-0" style="background: #e3f2fd; box-shadow: 0 -3px 10px 0 rgba(0,0,0,0.75);">
     <div class="container-xxl">
-        <a class="navbar-brand py-0" href="#">
-            <img src="/static/logo.png" alt="TeNews" class="img-fluid">
-        </a>
+        <div class="container-fluid p-0">
+            <div class="row">
+                <div class="col-lg-6 d-flex align-items-center">
+                    <a class="navbar-brand py-0 m-0" href="#">
+                        <img src="/static/logo.png" alt="TeNews" class="img-fluid">
+                    </a>
+                </div>
+                <div class="col-lg-6 d-flex justify-content-end align-items-center">
+                    <div style="
+                        color: #76b7dd;
+                        font-weight: bold;
+                        font-size: 3em;
+                        font-style: italic;
+                        line-height: 1.1em;
+                        text-align: center;
+                    ">
+                        {{ source_name }}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </nav>

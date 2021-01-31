@@ -18,8 +18,14 @@ def create_source(db):
 @pytest.fixture
 def create_target(db):
 
-    def make_create_target(source, url='test1.com', traffic=0, publish_time=timezone.now()):
-        return Target.objects.create(source=source, url=url, traffic=traffic, publish_time=publish_time)
+    def make_create_target(source, url='test1.com', traffic=0, publish_time=timezone.now(), created_at=None):
+        target = Target.objects.create(source=source, url=url, traffic=traffic, publish_time=publish_time)
+
+        if created_at is not None:
+            target.created_at = created_at
+            target.save()
+
+        return target
 
     return make_create_target
 

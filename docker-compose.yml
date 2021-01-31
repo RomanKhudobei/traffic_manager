@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+
+  db_django_psql:
+    image: postgres
+    container_name: db_django_psql
+    ports:
+      - '5432:5432'
+    env_file: .env
+    restart: always
+    volumes:
+      - db_django_psql:/var/lib/postgresql/data/
+
+volumes:
+  db_django_psql:

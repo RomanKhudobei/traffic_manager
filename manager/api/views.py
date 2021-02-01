@@ -16,21 +16,34 @@ class GetRandomTargetsApiView(APIView):
 
         sources = Source.objects.raw("""
             SELECT
-                "manager_source"."id",
-                "manager_source"."name",
-                "manager_source"."url",
-                "manager_source"."limit",
-                "manager_source"."is_active",
-                (
-                    SELECT SUM("traffic") AS "traffic_count"
-                    FROM (
-                        SELECT "traffic" FROM "manager_target" WHERE "source_id" = "manager_source"."id" ORDER BY "publish_time" DESC LIMIT 5
-                    )
-                ) AS "traffic_count"
-            FROM "manager_source"
+                ms.id
+                -- ms.name,
+                -- ms.url,
+                -- ms.limit,
+                -- ms.is_active,
+                -- tc.traffic_count
+            FROM manager_source ms
+            INNER JOIN (
+                SELECT
+                    manager_source.id AS ms_id,
+                    (
+                        SELECT SUM(traffic_list.traffic)
+                        FROM (
+                            SELECT
+                                manager_target.traffic AS traffic
+                            FROM manager_target
+                            WHERE manager_target.source_id = manager_source.id
+                            ORDER BY publish_time DESC
+                            LIMIT 5
+                        ) AS traffic_list
+                    ) AS traffic_count
+                FROM manager_source
+            ) AS tc
+            ON tc.ms_id = ms.id
             WHERE (
-                "manager_source"."is_active"
-                AND "traffic_count" < "manager_source"."limit"
+                ms.is_active
+                AND
+                tc.traffic_count < ms.limit
             )
         """)
 

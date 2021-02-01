@@ -1,3 +1,4 @@
+import datetime as dt
 
 from django.urls import reverse
 
@@ -71,7 +72,8 @@ def test_one_of_last_five_published_targets_are_returned(create_source, create_t
     source = create_source(limit=limit)
 
     for i in range(1, 7):
-        create_target(source, url=f'test{i}.com')
+        publish_time = dt.datetime.now() - dt.timedelta(days=i)
+        create_target(source, url=f'test{i}.com', publish_time=publish_time)
 
     for _ in range(limit):
         response = client.get(reverse('manager:random_targets'), **auth_header)

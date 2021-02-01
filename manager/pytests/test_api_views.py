@@ -1,11 +1,12 @@
-import pytest
+
 from django.urls import reverse
+
+import pytest
 
 
 @pytest.mark.django_db
 def test_target_returned_in_response(create_source, create_target, client, auth_header):
-    source = create_source()
-    target = create_target(source)
+    target = create_target(create_source())
 
     response = client.get(reverse('manager:random_targets'), **auth_header)
     random_targets = response.data
@@ -34,8 +35,7 @@ def test_one_random_target_returned_from_each_source(create_source, create_targe
 
 @pytest.mark.django_db
 def test_target_traffic_increases(create_source, create_target, client, auth_header):
-    source = create_source()
-    target = create_target(source)
+    target = create_target(create_source())
 
     client.get(reverse('manager:random_targets'), **auth_header)
 
@@ -45,8 +45,7 @@ def test_target_traffic_increases(create_source, create_target, client, auth_hea
 
 @pytest.mark.django_db
 def test_target_traffic_not_overcomes_source_limit(create_source, create_target, client, auth_header):
-    source = create_source()
-    create_target(source)
+    create_target(create_source())
 
     client.get(reverse('manager:random_targets'), **auth_header)
     response = client.get(reverse('manager:random_targets'), **auth_header)
@@ -57,8 +56,7 @@ def test_target_traffic_not_overcomes_source_limit(create_source, create_target,
 
 @pytest.mark.django_db
 def test_no_targets_are_returned_from_not_active_source(create_source, create_target, client, auth_header):
-    source = create_source(is_active=False)
-    create_target(source)
+    create_target(create_source(is_active=False))
 
     response = client.get(reverse('manager:random_targets'), **auth_header)
     random_targets = response.data
@@ -127,11 +125,8 @@ def test_static_targets_always_returned_in_response(create_source, create_target
 
 @pytest.mark.django_db
 def test_targets_not_returned_without_api_key(create_source, create_target, client):
-    source = create_source()
-    target = create_target(source)
+    create_target(create_source())
 
     response = client.get(reverse('manager:random_targets'))
-    random_targets = response.data
 
     assert response.status_code == 403
-    assert random_targets == {'detail': 'Authentication credentials were not provided.'}

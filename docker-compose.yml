@@ -11,6 +11,26 @@ services:
     restart: always
     volumes:
       - db_django_psql:/var/lib/postgresql/data/
+    networks:
+      - postgres
+
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    env_file: .env
+    restart: always
+    volumes:
+       - pgadmin:/root/.pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - postgres
 
 volumes:
   db_django_psql:
+  pgadmin:
+
+networks:
+  postgres:
+    driver: bridge

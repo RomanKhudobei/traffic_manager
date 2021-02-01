@@ -15,8 +15,10 @@ def parse_sources():
     sources = Source.objects.filter(is_active=True)
 
     for source in sources:
+        parser = SourceParser(source)
         try:
-            SourceParser.parse(source)
+            parser.parse()
+            parser.save()
 
         except urllib.error.URLError:
             logger.error(f'Connection Error: Could not parse source with id "{source.id}" and url "{source.url}"')

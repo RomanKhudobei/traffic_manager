@@ -13,50 +13,50 @@ logger = logging.getLogger(__name__)
 
 class SourceParser:
 
-    @staticmethod
-    def parse(source):
+    def __init__(self, source):
         """
-        Parses given source object and saves five last items from feed as Target elements to database
         :param source: source object
         :type source: manager.models.Source
+        """
+        self.__source = source
+        self.__items = []
+
+    def parse(self):
+        """
+        Parses given source object and saves five last items from feed as Target elements to database
 
         :raises urllib.error.URLError: connection issues
         :raises ValueError: Feed not found, invalid or empty
         """
+        feed = feedparser.parse(self.__source.url)
 
-        feed = feedparser.parse(source.url)
+        self.__items = feed.get('entries', [])[:5]
 
-        items = feed.get('entries', [])[:5]
-
-        if len(items) == 0:
+        if len(self.__items) == 0:
             raise ValueError('Feed is not found, empty or improperly parsed')
 
-        SourceParser.__save_to_db(source, items)
+    def save(self):
 
-    @staticmethod
-    def __save_to_db(source, items):
-
-        for item in items:
-            publish_time = SourceParser.__extract_publish_time(item)
+        for item in self.__items:
+            publish_time = self.__extract_publish_time(item)
             url = item.get('link')
             title = item.get('title')
 
             if url is None:
-                logger.warning(f'Source id "{source.id}" has item without url in feed')
+                logger.warning(f'Source id "{self.__source.id}" has item without url in feed')
                 continue
 
             if publish_time is None:
-                logger.warning(f'Source id "{source.id}" has item without publish time in feed')
+                logger.warning(f'Source id "{self.__source.id}" has item without publish time in feed')
 
             Target.objects.get_or_create(
-                source=source,
+                source=self.__source,
                 title=title,
                 url=url,
                 **({'publish_time': publish_time} if publish_time else {})
             )
 
-    @staticmethod
-    def __extract_publish_time(item):
+    def __extract_publish_time(self, item):
         publish_time_parsed = item.get('published_parsed')
 
         return dt.datetime.fromtimestamp(

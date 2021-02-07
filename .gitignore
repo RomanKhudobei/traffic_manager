@@ -5,3 +5,4 @@ venv
 *.log
 .coverage
 .env
+local_*

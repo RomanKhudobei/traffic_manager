@@ -127,9 +127,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / 'local_static',
 ]
 
 LOGGING = {
@@ -160,3 +161,8 @@ Q_CLUSTER = {
     "name": "default",
     "orm": "default",  # Use Django's ORM + database for broker
 }
+
+try:
+    from local_settings import *
+except ImportError:
+    pass

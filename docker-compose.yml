@@ -1,36 +1,61 @@
-version: '3'
+version: '2'
 
 services:
 
-  db_django_psql:
+  tm_db:
     image: postgres
-    container_name: db_django_psql
+    container_name: tm_db
     ports:
-      - '5432:5432'
+      - 5432:5432
     env_file: .env
     restart: always
     volumes:
-      - db_django_psql:/var/lib/postgresql/data/
+      - tm_db:/var/lib/postgresql/data/
     networks:
-      - postgres
+      - app-network
 
-
-  pgadmin:
-    container_name: pgadmin
+  tm_pgadmin:
+    container_name: tm_pgadmin
     image: dpage/pgadmin4
     env_file: .env
     restart: always
     volumes:
-       - pgadmin:/root/.pgadmin
+       - tm_pgadmin:/var/lib/pgadmin
     ports:
-      - "5050:80"
+      - 5050:80
     networks:
-      - postgres
+      - app-network
+
+  tm_web:
+    build: .
+    command: gunicorn traffic_manager.wsgi:application --bind 0.0.0.0:8000
+    container_name: tm_web
+    volumes:
+      - .:/code
+      - ./static:/code/static
+    expose:
+      - 8000
+    depends_on:
+      - tm_db
+    networks:
+      - app-network
+
+  tm_nginx:
+    build: ./nginx
+    container_name: tm_nginx
+    volumes:
+      - ./static:/code/static
+    ports:
+      - 8000:80
+    depends_on:
+      - tm_web
+    networks:
+      - app-network
 
 volumes:
-  db_django_psql:
-  pgadmin:
+  tm_db:
+  tm_pgadmin:
 
 networks:
-  postgres:
+  app-network:
     driver: bridge

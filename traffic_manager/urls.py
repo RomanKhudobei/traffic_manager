@@ -22,5 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('source/statistic/', manager_views.source_statistic_view, name='source_statistic'),
-    path('', include(('manager.api.urls', 'manager'), namespace='manager')),
+    path('api/', include(('manager.api.urls', 'manager'), namespace='manager')),
 ]

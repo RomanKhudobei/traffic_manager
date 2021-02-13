@@ -15,6 +15,8 @@ class SourceModelAdmin(admin.ModelAdmin):
 
     actions = ['test_parser']
 
+    change_form_template = 'admin/source/change_form_template.html'
+
     def test_parser(self, request, queryset):
         results = []
 

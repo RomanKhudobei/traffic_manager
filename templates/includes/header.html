@@ -1,10 +1,12 @@
+{% load static %}
+
 <nav class="navbar navbar-light pt-0" style="background: #e3f2fd; box-shadow: 0 -3px 10px 0 rgba(0,0,0,0.75);">
     <div class="container-xxl">
         <div class="container-fluid p-0">
             <div class="row">
                 <div class="col-lg-6 d-flex align-items-center justify-content-center justify-content-lg-start">
                     <a class="navbar-brand py-0 m-0" href="#">
-                        <img src="/local_static/logo.png" alt="TeNews" class="img-fluid">
+                        <img src="{% static 'logo.png' %}" alt="TeNews" class="img-fluid">
                     </a>
                 </div>
                 <div class="col-lg-6 d-flex align-items-center justify-content-center justify-content-lg-end">

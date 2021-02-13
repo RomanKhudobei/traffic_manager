@@ -1,12 +1,12 @@
 import datetime as dt
 
 from django.shortcuts import render, get_object_or_404
+from django.utils import translation
 
 from manager.models import Source
-from manager.utils import translate_to
 
 
-@translate_to(language_code='uk-ua')
+@translation.override('uk-ua')
 def source_statistic_view(request):
     source_name = request.GET.get('name')
 

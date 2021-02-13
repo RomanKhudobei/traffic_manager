@@ -28,7 +28,7 @@ services:
 
   tm_web:
     build: .
-    command: gunicorn traffic_manager.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn traffic_manager.wsgi:application --workers 2 --bind 0.0.0.0:8000
     container_name: tm_web
     volumes:
       - .:/code

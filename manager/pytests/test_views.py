@@ -53,13 +53,13 @@ def test_statistic_view_works_without_targets(create_source, client):
 @pytest.mark.django_db
 def test_statistic_view(create_source, create_target, client):
     today = dt.date.today()
-    target = create_target(create_source(name='Test'))
+    source = create_source(name='Test')
+    target = create_target(source)
 
     response = client.get(reverse('source_statistic'), {'name': 'Test', 'date': today.isoformat()})
 
     assert response.status_code == 200
     assert today.isoformat() in response.content.decode()
     assert target.url in response.content.decode()
-    # add these lines after title update
-    # assert target.title in response.content.decode()
-    # assert source.name in response.content.decode()
+    assert target.title in response.content.decode()
+    assert source.name in response.content.decode()

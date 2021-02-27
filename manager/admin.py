@@ -13,8 +13,10 @@ from manager.source_parser import SourceParser
 @admin.register(Source)
 class SourceModelAdmin(admin.ModelAdmin):
     list_display = ('name', 'todays_traffic', 'limit', 'is_active')
+
     list_filter = ('is_active',)
     search_fields = ('name', 'url')
+
     readonly_fields = ('statistic_view_token',)
 
     actions = ['test_parser']
@@ -61,12 +63,13 @@ class SourceModelAdmin(admin.ModelAdmin):
 
 @admin.register(Target)
 class TargetModelAdmin(admin.ModelAdmin):
-    list_display = ('get_source_name', 'get_hyperlinked_title', 'traffic', 'publish_time', 'created_at')
     fields = ('source', 'title', 'url', 'traffic', 'publish_time', 'created_at')
-    # readonly_fields = ('source', 'title', 'url', 'traffic', 'publish_time', 'created_at')
-    readonly_fields = ('created_at', )
+    list_display = ('get_source_name', 'get_hyperlinked_title', 'traffic', 'publish_time', 'created_at')
+
     search_fields = ('url', 'source__name')
     list_filter = ('source__name', 'publish_time', 'created_at')
+
+    readonly_fields = ('source', 'title', 'url', 'traffic', 'publish_time', 'created_at')
 
     def get_source_name(self, obj):
         return obj.source.name
@@ -85,8 +88,11 @@ class TargetModelAdmin(admin.ModelAdmin):
 @admin.register(StaticTarget)
 class StaticTargetModelAdmin(admin.ModelAdmin):
     list_display = ('name', 'url', 'traffic', 'last_reset_at', 'is_active')
+
     search_fields = ('name', 'url')
     list_filter = ('is_active',)
+
+    readonly_fields = ('traffic', 'last_reset_at')
 
     actions = ['reset_traffic']
 

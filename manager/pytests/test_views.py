@@ -4,38 +4,37 @@ from django.urls import reverse
 
 
 @pytest.mark.django_db
-def test_statistic_view_return_404_without_name_parameter(create_source, create_target, client):
+def test_statistic_view_return_404_with_invalid_token(create_source, create_target, client):
     create_target(create_source())
 
-    response = client.get(reverse('source_statistic'))
-
-    assert response.status_code == 404
-
-
-@pytest.mark.django_db
-def test_statistic_view_return_404_with_name_not_exist(create_source, create_target, client):
-    create_target(create_source())
-
-    response = client.get(reverse('source_statistic'), {'name': 'not-exist'})
+    response = client.get(reverse('source_statistic', kwargs={'token': 'invalid-token'}))
 
     assert response.status_code == 404
 
 
 @pytest.mark.django_db
 def test_statistic_view_not_fail_with_invalid_date_parameter(create_source, create_target, client):
-    create_target(create_source(name='Test'))
+    source = create_source()
+    create_target(source)
 
-    response = client.get(reverse('source_statistic'), {'name': 'Test', 'date': 'invalid-date'})
+    response = client.get(
+        reverse('source_statistic', kwargs={'token': source.statistic_view_token}),
+        {'date': 'invalid-date'}
+    )
 
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
 def test_statistic_view_works_with_future_date_parameter(create_source, create_target, client):
-    future_date = dt.date.today() + dt.timedelta(days=1)
-    create_target(create_source(name='Test'))
+    source = create_source()
+    create_target(source)
 
-    response = client.get(reverse('source_statistic'), {'name': 'Test', 'date': future_date.isoformat()})
+    future_date = dt.date.today() + dt.timedelta(days=1)
+    response = client.get(
+        reverse('source_statistic', kwargs={'token': source.statistic_view_token}),
+        {'date': future_date.isoformat()}
+    )
 
     assert response.status_code == 200
     assert future_date.isoformat() not in response.content.decode()
@@ -43,20 +42,24 @@ def test_statistic_view_works_with_future_date_parameter(create_source, create_t
 
 @pytest.mark.django_db
 def test_statistic_view_works_without_targets(create_source, client):
-    create_source(name='Test')
+    source = create_source()
 
-    response = client.get(reverse('source_statistic'), {'name': 'Test'})
+    response = client.get(reverse('source_statistic', kwargs={'token': source.statistic_view_token}))
 
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
 def test_statistic_view(create_source, create_target, client):
-    today = dt.date.today()
     source = create_source(name='Test')
     target = create_target(source)
 
-    response = client.get(reverse('source_statistic'), {'name': 'Test', 'date': today.isoformat()})
+    today = dt.date.today()
+
+    response = client.get(
+        reverse('source_statistic', kwargs={'token': source.statistic_view_token}),
+        {'date': today.isoformat()}
+    )
 
     assert response.status_code == 200
     assert today.isoformat() in response.content.decode()

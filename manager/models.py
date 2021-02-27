@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.utils import timezone
 
@@ -10,6 +12,7 @@ class Source(models.Model):
     url = models.URLField(unique=True, help_text='Посилання на RSS стрічку')
     limit = models.PositiveIntegerField()
     is_active = models.BooleanField(default=True)
+    statistic_view_token = models.UUIDField(default=uuid.uuid4)
 
     def __str__(self):
         return self.name

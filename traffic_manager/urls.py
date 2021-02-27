@@ -21,6 +21,6 @@ from manager import views as manager_views
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('source/statistic/', manager_views.source_statistic_view, name='source_statistic'),
+    path('source/statistic/<str:token>/', manager_views.source_statistic_view, name='source_statistic'),
     path('api/', include(('manager.api.urls', 'manager'), namespace='manager')),
 ]

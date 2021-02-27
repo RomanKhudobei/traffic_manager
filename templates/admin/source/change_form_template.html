@@ -2,7 +2,7 @@
 
 {% block object-tools-items %}
     <li>
-        <a href="{% url 'source_statistic' %}?name={{ original.name }}">
+        <a href="{% url 'source_statistic' token=original.statistic_view_token %}" target="_blank">
             View Statistic
         </a>
     </li>

@@ -14,7 +14,6 @@
             <div class="col-sm-4">
                 <form method="GET">
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 100%">
-                        <input type="hidden" name="name" value="{{ source_name }}">
                         <select class="form-select" name="date" onchange="this.form.submit()">
                             {% for date in dates %}
                                 <option value="{{ date.isoformat }}"{% if date.isoformat == selected_date.isoformat %} selected{% endif %}>{{ date }}</option>

@@ -36,4 +36,6 @@ class StaticTarget(models.Model):
     """
     name = models.CharField(max_length=50)
     url = models.URLField(unique=True)
+    traffic = models.PositiveIntegerField(default=0)
+    last_reset_at = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)

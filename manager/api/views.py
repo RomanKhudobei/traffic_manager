@@ -61,6 +61,9 @@ class GetRandomTargetsApiView(APIView):
 
             random_targets.append(target.url)
 
-        random_targets.extend(StaticTarget.objects.filter(is_active=True).values_list('url', flat=True))
+        static_targets = StaticTarget.objects.filter(is_active=True)
+        random_targets.extend(static_targets.values_list('url', flat=True))
+
+        static_targets.update(traffic=F('traffic')+1)
 
         return Response(data=random_targets, status=status.HTTP_200_OK)

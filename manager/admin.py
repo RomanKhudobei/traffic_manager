@@ -3,6 +3,7 @@ import datetime as dt
 
 from django.contrib import admin, messages
 from django.db.models import Sum
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from manager.models import Source, Target, StaticTarget
@@ -83,6 +84,14 @@ class TargetModelAdmin(admin.ModelAdmin):
 
 @admin.register(StaticTarget)
 class StaticTargetModelAdmin(admin.ModelAdmin):
-    list_display = ('name', 'url', 'is_active')
+    list_display = ('name', 'url', 'traffic', 'last_reset_at', 'is_active')
     search_fields = ('name', 'url')
     list_filter = ('is_active',)
+
+    actions = ['reset_traffic']
+
+    def reset_traffic(self, request, queryset):
+        queryset.update(traffic=0, last_reset_at=timezone.now())
+        self.message_user(request, 'Трафік обнулено')
+
+    reset_traffic.short_description = 'Обнулити трафік'

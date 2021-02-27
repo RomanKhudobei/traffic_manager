@@ -93,6 +93,16 @@ def test_static_target_returned_in_response(create_static_target, client, auth_h
 
 
 @pytest.mark.django_db
+def test_static_target_traffic_increases(create_static_target, client, auth_header):
+    static_target = create_static_target()
+
+    client.get(reverse('manager:random_targets'), **auth_header)
+
+    static_target.refresh_from_db()
+    assert static_target.traffic == 1
+
+
+@pytest.mark.django_db
 def test_not_active_static_targets_is_not_returned(create_static_target, client, auth_header):
     create_static_target(is_active=False)
 

@@ -1,6 +1,8 @@
 import urllib.error
+import datetime as dt
 
 from django.contrib import admin, messages
+from django.db.models import Sum
 from django.utils.safestring import mark_safe
 
 from manager.models import Source, Target, StaticTarget
@@ -9,7 +11,7 @@ from manager.source_parser import SourceParser
 
 @admin.register(Source)
 class SourceModelAdmin(admin.ModelAdmin):
-    list_display = ('name', 'limit', 'is_active')
+    list_display = ('name', 'todays_traffic', 'limit', 'is_active')
     list_filter = ('is_active',)
     search_fields = ('name', 'url')
 
@@ -46,6 +48,14 @@ class SourceModelAdmin(admin.ModelAdmin):
 
     test_parser.short_description = 'Тест парсера'
 
+    def todays_traffic(self, obj):
+        return Target.objects.filter(
+            source=obj,
+            publish_time__date=dt.date.today()
+        ).aggregate(todays_traffic_count=Sum('traffic')).get('todays_traffic_count')
+
+    todays_traffic.short_description = 'Today\'s traffic'
+
 
 @admin.register(Target)
 class TargetModelAdmin(admin.ModelAdmin):
@@ -54,7 +64,7 @@ class TargetModelAdmin(admin.ModelAdmin):
     # readonly_fields = ('source', 'title', 'url', 'traffic', 'publish_time', 'created_at')
     readonly_fields = ('created_at', )
     search_fields = ('url', 'source__name')
-    list_filter = ('source__name',)
+    list_filter = ('source__name', 'publish_time', 'created_at')
 
     def get_source_name(self, obj):
         return obj.source.name

@@ -1,5 +1,6 @@
 import urllib.error
 import datetime as dt
+import uuid
 
 from django.contrib import admin, messages
 from django.db.models import Sum
@@ -19,7 +20,7 @@ class SourceModelAdmin(admin.ModelAdmin):
 
     readonly_fields = ('statistic_view_token',)
 
-    actions = ['test_parser']
+    actions = ['test_parser', 'regenerate_statistic_view_token']
 
     change_form_template = 'admin/source/change_form_template.html'
 
@@ -51,6 +52,16 @@ class SourceModelAdmin(admin.ModelAdmin):
         self.message_user(request, mark_safe(f"Результати тестування:<br>{results_html}"), level=messages.WARNING)
 
     test_parser.short_description = 'Тест парсера'
+
+    def regenerate_statistic_view_token(self, request, queryset):
+
+        for source in queryset:
+            source.statistic_view_token = uuid.uuid4()
+            source.save()
+
+        self.message_user(request, 'Токен для перегляду сторінки статистики оновлено', level=messages.SUCCESS)
+
+    regenerate_statistic_view_token.short_description = 'Оновити токен для перегляду статистики'
 
     def todays_traffic(self, obj):
         return Target.objects.filter(

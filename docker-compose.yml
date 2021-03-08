@@ -2,59 +2,72 @@ version: '2'
 
 services:
 
-  tm_db:
+  db:
     image: postgres
-    container_name: tm_db
+    container_name: db
     ports:
       - 5432:5432
     env_file: .env
     restart: always
     volumes:
-      - tm_db:/var/lib/postgresql/data/
+      - db:/var/lib/postgresql/data/
     networks:
       - app-network
 
-  tm_pgadmin:
-    container_name: tm_pgadmin
+  pgadmin:
+    container_name: pgadmin
     image: dpage/pgadmin4
     env_file: .env
     restart: always
     volumes:
-       - tm_pgadmin:/var/lib/pgadmin
+       - pgadmin:/var/lib/pgadmin
     ports:
       - 5050:80
     networks:
       - app-network
 
-  tm_web:
+  web:
     build: .
-    command: gunicorn traffic_manager.wsgi:application --workers 2 --bind 0.0.0.0:8000
-    container_name: tm_web
+    command: gunicorn traffic_manager.wsgi:application --workers 4 --bind 0.0.0.0:8000
+    container_name: web
     volumes:
       - .:/code
-      - ./static:/code/static
+      - static:/code/static
     expose:
       - 8000
     depends_on:
-      - tm_db
+      - db
     networks:
       - app-network
 
-  tm_nginx:
+  nginx:
     build: ./nginx
-    container_name: tm_nginx
+    container_name: nginx
     volumes:
-      - ./static:/code/static
+      - static:/code/static
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
     ports:
-      - 8000:80
+      - 80:80
+      - 443:443
     depends_on:
-      - tm_web
+      - web
     networks:
       - app-network
+
+  certbot:
+    image: certbot/certbot:v0.36.0
+    container_name: certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    depends_on:
+      - web
 
 volumes:
-  tm_db:
-  tm_pgadmin:
+  db:
+  pgadmin:
+  static:
 
 networks:
   app-network:

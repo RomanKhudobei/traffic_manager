@@ -1,6 +1,6 @@
 import random
 
-from django.db.models import F
+from django.db.models import F, Q
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -30,7 +30,10 @@ class GetRandomTargetsApiView(APIView):
 
             random_targets.append(target.url)
 
-        static_targets = StaticTarget.objects.filter(is_active=True)
+        static_targets = StaticTarget.objects.filter(
+            Q(is_active=True),
+            Q(traffic__lt=F('limit')) | Q(limit=-1)
+        )
         random_targets.extend(static_targets.values_list('url', flat=True))
 
         static_targets.update(traffic=F('traffic')+1)

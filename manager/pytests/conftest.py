@@ -33,8 +33,8 @@ def create_target(db):
 @pytest.fixture
 def create_static_target(db):
 
-    def make_create_static_target(name='Test', url='static-test.com/', is_active=True):
-        return StaticTarget.objects.create(name=name, url=url, is_active=is_active)
+    def make_create_static_target(name='Test', url='static-test.com/', limit=1, is_active=True):
+        return StaticTarget.objects.create(name=name, url=url, limit=limit, is_active=is_active)
 
     return make_create_static_target
 

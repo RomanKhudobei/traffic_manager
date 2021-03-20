@@ -133,6 +133,17 @@ def test_static_target_traffic_increases(create_static_target, client, auth_head
 
 
 @pytest.mark.django_db
+def test_static_target_not_overcomes_limit(create_static_target, client, auth_header):
+    static_target = create_static_target()
+
+    client.get(reverse('manager:random_targets'), **auth_header)
+    client.get(reverse('manager:random_targets'), **auth_header)
+
+    static_target.refresh_from_db()
+    assert static_target.traffic == 1
+
+
+@pytest.mark.django_db
 def test_not_active_static_targets_is_not_returned(create_static_target, client, auth_header):
     create_static_target(is_active=False)
 
@@ -143,7 +154,7 @@ def test_not_active_static_targets_is_not_returned(create_static_target, client,
 
 
 @pytest.mark.django_db
-def test_static_targets_always_returned_in_response(create_source, create_target, create_static_target, client, auth_header):
+def test_static_targets_without_limit_always_returned_in_response(create_source, create_target, create_static_target, client, auth_header):
     source1 = create_source(url='source1.com', limit=5)
     create_target(source1, url='source1.com/page-1')
     create_target(source1, url='source1.com/page-2')
@@ -152,8 +163,8 @@ def test_static_targets_always_returned_in_response(create_source, create_target
     create_target(source2, url='source2.com/page-1')
     create_target(source2, url='source2.com/page-2')
 
-    static_target1 = create_static_target(url='static-target1.com')
-    static_target2 = create_static_target(url='static-target2.com')
+    static_target1 = create_static_target(url='static-target1.com', limit=-1)
+    static_target2 = create_static_target(url='static-target2.com', limit=-1)
 
     for _ in range(10):
         response = client.get(reverse('manager:random_targets'), **auth_header)

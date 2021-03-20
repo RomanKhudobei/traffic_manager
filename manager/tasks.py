@@ -1,7 +1,9 @@
 import logging
 import urllib.error
 
-from manager.models import Source
+from django.db.models import F
+
+from manager.models import Source, StaticTarget
 from manager.source_parser import SourceParser
 
 
@@ -30,8 +32,8 @@ def parse_sources():
 
 
 def reset_remaining_traffic_for_sources():
+    Source.objects.update(remaining_traffic=F('limit'))
 
-    for source in Source.objects.all():
-        source.remaining_traffic = source.limit
-        # TODO: add update_fields to save calls
-        source.save(update_fields=['remaining_traffic'])
+
+def reset_traffic_for_static_targets():
+    StaticTarget.objects.update(traffic=0)

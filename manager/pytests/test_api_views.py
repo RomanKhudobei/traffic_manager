@@ -1,8 +1,10 @@
 import datetime as dt
 
+import pytz
 from django.urls import reverse
 
 import pytest
+from freezegun import freeze_time
 
 
 @pytest.mark.django_db
@@ -42,6 +44,34 @@ def test_target_traffic_increases(create_source, create_target, client, auth_hea
 
     target.refresh_from_db()
     assert target.traffic == 1
+
+
+@pytest.mark.django_db
+def test_source_remaining_traffic_decreases(create_source, create_target, client, auth_header):
+    source = create_source()
+    create_target(source)
+
+    client.get(reverse('manager:random_targets'), **auth_header)
+
+    source.refresh_from_db()
+    assert source.remaining_traffic == 0
+
+
+@pytest.mark.django_db
+def test_source_remaining_traffic_decreases_for_yesterday_targets(create_source, create_target, client, auth_header):
+    today = dt.datetime.now(tz=pytz.timezone('Europe/Kiev')).replace(hour=1, minute=0, second=0, microsecond=0)
+    yesterday = (today - dt.timedelta(days=1)).replace(hour=23)
+
+    with freeze_time(yesterday) as frozen_time:
+        source = create_source()
+        create_target(source)
+
+        frozen_time.move_to(today)
+
+        client.get(reverse('manager:random_targets'), **auth_header)
+
+        source.refresh_from_db()
+        assert source.remaining_traffic == 0
 
 
 @pytest.mark.django_db

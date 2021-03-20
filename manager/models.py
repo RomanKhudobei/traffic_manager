@@ -11,11 +11,19 @@ class Source(models.Model):
     name = models.CharField(max_length=50)
     url = models.URLField(unique=True, help_text='Посилання на RSS стрічку')
     limit = models.PositiveIntegerField()
+    remaining_traffic = models.PositiveIntegerField()
     is_active = models.BooleanField(default=True)
     statistic_view_token = models.UUIDField(default=uuid.uuid4)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+
+        if not self.id:
+            self.remaining_traffic = self.limit
+
+        super().save(*args, **kwargs)
 
 
 class Target(models.Model):

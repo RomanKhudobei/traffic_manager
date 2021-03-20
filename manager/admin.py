@@ -13,7 +13,7 @@ from manager.source_parser import SourceParser
 
 @admin.register(Source)
 class SourceModelAdmin(admin.ModelAdmin):
-    list_display = ('name', 'todays_traffic', 'limit', 'is_active')
+    list_display = ('name', 'todays_traffic', 'limit', 'remaining_traffic', 'is_active')
 
     list_filter = ('is_active',)
     search_fields = ('name', 'url')

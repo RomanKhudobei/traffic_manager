@@ -1,5 +1,4 @@
 import random
-import datetime as dt
 
 from django.db.models import F
 from rest_framework import status
@@ -14,40 +13,7 @@ class GetRandomTargetsApiView(APIView):
     permission_classes = [HasAPIKey]
 
     def get(self, request):
-        today = dt.date.today().isoformat()
-
-        # get all sources, that not overcomes traffic limit per day
-        sources = Source.objects.raw("""
-            SELECT
-                ms.id
-                -- ms.name,
-                -- ms.url,
-                -- ms.limit,
-                -- ms.is_active,
-                -- tc.traffic_count
-            FROM manager_source ms
-            INNER JOIN (
-                SELECT
-                    manager_source.id AS ms_id,
-                    (
-                        SELECT SUM(traffic_list.traffic)
-                        FROM (
-                            SELECT
-                                manager_target.traffic AS traffic
-                            FROM manager_target
-                            WHERE manager_target.source_id = manager_source.id
-                            AND CAST(publish_time AS DATE) = '{date}'
-                        ) AS traffic_list
-                    ) AS traffic_count
-                FROM manager_source
-            ) AS tc
-            ON tc.ms_id = ms.id
-            WHERE (
-                ms.is_active
-                AND
-                tc.traffic_count < ms.limit
-            )
-        """.format(date=today))
+        sources = Source.objects.filter(remaining_traffic__gt=0, is_active=True)
 
         random_targets = []
 
@@ -58,6 +24,9 @@ class GetRandomTargetsApiView(APIView):
             # NOTE: Could move this operation to shared task
             target.traffic = F('traffic') + 1
             target.save()
+
+            source.remaining_traffic = F('remaining_traffic') - 1
+            source.save()
 
             random_targets.append(target.url)
 

@@ -27,3 +27,11 @@ def parse_sources():
         except ValueError:
             logger.warning(f'Feed is not found or empty (source.id: "{source.id}") (url: "{source.url}")')
             continue
+
+
+def reset_remaining_traffic_for_sources():
+
+    for source in Source.objects.all():
+        source.remaining_traffic = source.limit
+        # TODO: add update_fields to save calls
+        source.save(update_fields=['remaining_traffic'])

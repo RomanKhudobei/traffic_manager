@@ -52,10 +52,10 @@ class SourceParser:
 
             try:
                 Target.objects.get_or_create(
+                    defaults=({'publish_time': publish_time} if publish_time else {}),
                     source=self.__source,
                     title=title,
                     url=url,
-                    **({'publish_time': publish_time} if publish_time else {})
                 )
             except MultipleObjectsReturned:
                 dup_targets = Target.objects.filter(

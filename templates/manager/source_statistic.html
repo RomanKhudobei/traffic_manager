@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load scale_traffic %}
 
 {% block title %}Статистика відвідувань - {{ source_name }}{% endblock %}
 
@@ -40,7 +41,7 @@
                     <a href="{{ target.url }}" target="_blank">{{ target.title }}</a>
                 </div>
                 <div class="col-3 p-2">{{ target.created_at }}</div>
-                <div class="col-3 p-2">{{ target.traffic }}</div>
+                <div class="col-3 p-2">{{ target.traffic|scale_traffic }}</div>
             </div>
         {% empty %}
             <div class="text-center border-bottom p-2">Не знайдено</div>

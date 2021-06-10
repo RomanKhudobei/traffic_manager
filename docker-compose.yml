@@ -28,7 +28,10 @@ services:
 
   web:
     build: .
-    command: gunicorn traffic_manager.wsgi:application --workers 4 --bind 0.0.0.0:8000
+    command: bash -c "
+      python manage.py migrate &&
+      python manage.py collectstatic --no-input &&
+      gunicorn traffic_manager.wsgi:application --workers 4 --bind 0.0.0.0:8000"
     container_name: web
     volumes:
       - .:/code

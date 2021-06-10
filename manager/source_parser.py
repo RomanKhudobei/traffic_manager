@@ -4,6 +4,7 @@ import time
 import pytz
 
 import feedparser
+from django.core.exceptions import MultipleObjectsReturned
 
 from manager.models import Target
 
@@ -49,12 +50,20 @@ class SourceParser:
             if publish_time is None:
                 logger.warning(f'Source id "{self.__source.id}" has item without publish time in feed')
 
-            Target.objects.get_or_create(
-                source=self.__source,
-                title=title,
-                url=url,
-                **({'publish_time': publish_time} if publish_time else {})
-            )
+            try:
+                Target.objects.get_or_create(
+                    source=self.__source,
+                    title=title,
+                    url=url,
+                    **({'publish_time': publish_time} if publish_time else {})
+                )
+            except MultipleObjectsReturned:
+                dup_targets = Target.objects.filter(
+                    source=self.__source,
+                    title=title,
+                    url=url,
+                )
+                logger.error(f'Duplicate targets found (source {self.__source}) (title {title}) (url {url})\n{dup_targets}')
 
     def __extract_publish_time(self, item):
         publish_time_parsed = item.get('published_parsed')

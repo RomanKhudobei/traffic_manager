@@ -48,7 +48,7 @@ services:
     command: bash -c "
       python manage.py migrate &&
       python manage.py qcluster"
-    container_name: web
+    container_name: qcluster
     volumes:
       - .:/code
       - static:/code/static

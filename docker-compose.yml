@@ -43,6 +43,21 @@ services:
     networks:
       - app-network
 
+  qcluster:
+    build: .
+    command: bash -c "
+      python manage.py migrate &&
+      python manage.py qcluster"
+    container_name: web
+    volumes:
+      - .:/code
+      - static:/code/static
+    depends_on:
+      - db
+      - web
+    networks:
+      - app-network
+
   nginx:
     build: ./nginx
     container_name: nginx

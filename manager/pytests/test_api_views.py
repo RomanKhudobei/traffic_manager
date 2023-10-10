@@ -199,3 +199,12 @@ def test_only_today_published_targets_are_accounted_for_traffic_limit(create_sou
         random_targets == ['test.com/page-1'],
         random_targets == ['test.com/page-2'],
     ])
+
+
+def test_empty_list_returned_when_there_is_no_targets(create_source, client, auth_header):
+    create_source(url='test.com/rss', limit=5)
+
+    response = client.get(reverse('manager:random_targets'), **auth_header)
+    random_targets = response.data
+
+    assert random_targets == []

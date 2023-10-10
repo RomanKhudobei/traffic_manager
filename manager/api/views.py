@@ -1,4 +1,5 @@
 import random
+import logging
 
 from django.db.models import F, Q
 from rest_framework import status
@@ -9,15 +10,23 @@ from rest_framework_api_key.permissions import HasAPIKey
 from manager.models import Source, StaticTarget
 
 
+logger = logging.getLogger(__name__)
+
+
 class GetRandomTargetsApiView(APIView):
     permission_classes = [HasAPIKey]
 
     def get(self, request):
-        sources = Source.objects.filter(remaining_traffic__gt=0, is_active=True)
+        sources = Source.objects.filter(remaining_traffic__gt=0, is_active=True).prefetch_related('targets')
 
         random_targets = []
 
         for source in sources:
+
+            if source.targets.count() == 0:
+                logger.info(f'Source "{source.name}" does not have targets. Skipping...')
+                continue
+
             # get one random target from last five published
             target = random.choice(source.targets.order_by('-publish_time')[:5])
 
